@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<HTML>
+	<HEAD>
+		<meta charset="UTF-8">
+		<TITLE>
+			ВКассе — калькулятор наличных
+		</TITLE>
+		<link rel="icon" type="image/png" sizes="96x96" href="./favicon96.png">
+		<style>
+
+			body {
+				font-family: verdana, arial, sans-serif ;
+				font-size: 12px ;
+			}
+
+			th,
+			td {
+				padding: 4px 4px 4px 4px ;
+				text-align: right ;
+				width: 200px;
+			}
+			
+			th {
+				border-bottom: 2px solid #333333;
+				border-right: 1px dotted #999999 ;
+				width: 120px;
+			}
+
+			td {
+				border-bottom: 1px dotted #999999 ;
+				border-right: 1px dotted #999999 ;
+			}
+
+			tfoot td {
+				border-bottom-width: 0px ;
+				border-top: 2px solid #333333 ;
+				padding-top: 20px ;
+			}
+			
+			.divresult {
+				width: 800px;
+			}
+			
+			.resulttd {
+				font-size: 16px;
+				font-weight: bold;
+				text-align: right ;
+				border-top: 2px solid #333333 ;
+			}
+			
+			.printlink {
+				font-size: 12px;
+			}
+			
+		</style>
+		
+   </HEAD>
+
+<BODY>
+
+
+<div class="divresult">
+<p>Калькулятор наличных: простой и удобный.</p>
+<div name="prn_tbl">
+</div>
+<a href="#" onclick="Print(); return false;"  class = "printlink">Распечатать</a><br/>
+
+<script language="Javascript">
+
+var urlParams;
+
+(window.onpopstate = function () {
+    var match,
+        pl     = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query  = window.location.search.substring(1);
+
+    urlParams = new Array();
+	
+    while (match = search.exec(query)) {
+		var key = decode(match[1]);
+		var value = decode(match[2]);
+		urlParams.push({'name': key, 'value': value});
+	}
+})();
+
+function RenderContent(params) {
+	var div_table = document.getElementsByName("prn_tbl")[0];
+	var html = "";
+	html += "<table cellspacing=\"0\">";
+	html += "<thead>";
+	html += "<tr>";
+	html += "<th>Номинал</th>";
+	html += "<th>Кол-во</th>";
+	html += "<th>Сумма</th>";
+	html += "</tr>";
+	html += "</thead>";
+	
+	var mulName = params[0].value;
+	var divName = params[1].value;
+	var fractionDevider = parseInt(params[2].value);
+
+	var summ = 0.0;
+	
+	for (var i = 3; i < params.length; ++i) {
+		var name = params[i].name;
+		var value = params[i].value;
+		
+		var type = GetType(name);
+		var nominal = GetNominal(name);
+		var count = parseInt(value);
+		var isMul = (type == 'MUL');
+		var divider = isMul ? 1.0 : fractionDevider;
+		
+		var curSumm = nominal * count / divider;
+		summ += curSumm;
+		
+		if (count <= 0) continue;
+		
+		html += "<tr>";
+		html += "<td>";
+		html += nominal + " " + (isMul ? mulName : divName);
+		html += "</td>";
+		html += "<td>";
+		html += count;
+		html += "</td>";
+		html += "<td>";
+		html += SummToString(curSumm, mulName, divName, false);
+		html += "</td>";
+		html += "</tr>";
+	}
+
+		html += "<tr>";
+		html += "<td>";
+		html += "";
+		html += "</td>";
+		html += "<td class=\"resulttd\">";
+		html += "Итог:";
+		html += "</td>";
+		html += "<td class=\"resulttd\">";
+		html += SummToString(summ, mulName, divName, true);
+		html += "</td>";
+		html += "</tr>";
+	
+	html += "</table>";
+	
+	div_table.innerHTML = html;
+}
+
+// mul_100 -> mul
+// div_50 -> div
+function GetType(editId) {
+	return editId.substring(0, 3).toUpperCase();
+}
+
+// mul_100 -> 100
+function GetNominal(editId) {
+	return parseInt(editId.substring(4));
+}
+
+
+function SummToString(summ, intName, fracName, forceInt) {
+	var i = Math.floor(summ * 100 + 0.001);
+	var d = i % 100;
+	var r = (i - d) / 100;
+	
+	var frac = "" + d;
+	if (r > 0) {
+		if (d == 0) {frac = "00"} 
+		else if (d < 10) {frac = "0" + d}
+	}
+
+	return ((r > 0 || forceInt) ? r + " " + intName : "") 
+		+ (d > 0 ? " " + frac + " " + fracName : "");
+}
+
+function Print() 
+{
+	window.print();
+	return true;
+}
+
+RenderContent(urlParams);
+    
+</script>
+
+
+</BODY>
+</HTML>

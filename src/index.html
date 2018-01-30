@@ -1,0 +1,503 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<HTML>
+	<HEAD>
+		<meta charset="UTF-8">
+		<TITLE>
+			ВКассе — калькулятор наличных
+		</TITLE>
+		<link rel="icon" type="image/png" sizes="96x96" href="./favicon96.png">
+		<style>
+			body {
+				background-color: #EFEFEF;
+				color: #888888;
+				font-family: "verdana";
+			}
+		
+			input {
+				font-size: 22pt;
+				border-radius: 8px;
+				background-color: #FAFAFA;
+			} 
+			
+			td {
+				vertical-align: top;
+			}
+            
+            form {
+                margin-bottom: 0px;
+            }
+			
+			.logotext {
+				font-size: 16pt;
+				color: #888888;
+				font-family: "verdana";
+			}
+
+			.logotextbig {
+				font-size: 32pt;
+				color: #888888;
+				font-family: "Times New Roman", Georgia, Serif;
+			}
+			
+			.tdcenter {
+				vertical-align: middle;
+			}
+			
+			.divhdr {
+				width: 100%;
+				height: 70px;
+				background-color: #DFDFDF;
+				border-radius: 1em;
+			}
+			
+			.divfooter {
+				width: 100%;
+				height: 90px;
+				background-color: #DFDFDF;
+				font-size: 10pt;
+				color: #555555;
+				text-align:center;
+				border-radius: 1em;
+                padding: 5px
+			}
+			
+			.vdelim {
+				width: 100%;
+				height: 20px;
+			}
+			
+			.divresults{
+				width: 100%;
+				height: 68px;
+				background-color: #DFDFDF;
+				border-radius: 1em;
+				margin-top: 20px;
+                margin-bottom: 20px;
+			}
+			
+			.divcenter {
+				padding: 10px 10px 10px 20px;
+				width: 800px;
+				text-align: center;
+				display: block;
+				margin-left: auto;
+				margin-right: auto;
+				vertical-align: middle;
+			}
+
+			.divcenter2 {
+				padding: 10px 10px 10px 20px;
+				text-align: center;
+				display: block;
+				margin-left: auto;
+				margin-right: auto;
+				vertical-align: middle;
+			}
+			.resulttext {
+                padding: 10px;
+                font-size: 20pt;
+                font-weight: bold;
+				text-align: center;
+			}			
+			.resulttextgreen {
+				color: #339933;
+			}
+
+			.content {
+				background-color: #FFFFFF;
+				border-radius: 1em;
+				padding: 10px 20px 10px 20px;
+			}
+			
+			.pright {
+				text-align: right;
+			}
+            
+            .copyrighttext {
+               padding: 0px;
+               margin-top: 10px;
+               font-size: 8pt;
+            }
+            
+            .my_button {
+                width: 100px;
+                height: 30px;
+                margin: 0 auto;
+            }
+
+            .my_button a {
+                display: block;	
+                text-decoration: none;
+                color: #888888;
+                font-weight: bold;
+            }
+
+            .my_button div {	
+                text-align:center;
+                border-radius: 20px 20px 20px 20px;
+                background-color: #EFEFEF;
+                padding: 10px;
+                margin: 0;    
+            }
+
+            .my_button div:hover {
+                background: rgba(134, 168, 218, 0.8);
+                color: white;
+            }
+
+            
+			
+		</style>
+   </HEAD>
+
+<BODY>
+
+
+<script language="Javascript">
+
+var urlParams;
+
+(window.onpopstate = function () {
+    var match,
+        pl     = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query  = window.location.search.substring(1);
+
+    urlParams = new Array();
+	
+    while (match = search.exec(query)) {
+		var key = decode(match[1]);
+		var value = decode(match[2]);
+		urlParams.push({'name': key, 'value': value});
+	}
+})();
+
+function KeyPress(e, element) {
+      var kk = navigator.appName == 'Netscape' ? e.which : e.keyCode;
+      if (kk == 13)
+      {
+         document.keypressform.elements[element].focus();
+         return false
+      } else {
+         recalc();
+      }
+      return true
+}
+
+function isNumber(event, element) {
+    if (KeyPress(event, element)) {
+        return (event.charCode >= 48 && event.charCode <= 57);
+    }
+    return false;
+}    
+    
+</script>
+
+<div class="divcenter">
+
+<div class="divhdr">
+<table border="0" width="100%">
+	<tr>
+		<td width="20px"></td>
+		<td class = "tdcenter" width="70px">
+			<img src="./img/logo60.png"/>
+		</td>
+
+		<td width="10px"></td>
+		<td class = "tdcenter" width="80px">
+			<span class="logotextbig">ВКассе</span>
+		</td>
+
+		<td width="100px"></td>	
+		<td class = "tdcenter">
+			<p align="right"><span class="logotext">Калькулятор наличных:<br/>простой и удобный</span></p>
+		</td>
+		
+		<td width="20px"></td>	
+	</tr>
+</table>	
+</div>
+
+<!--<div class="vdelim"></div>-->
+
+<div class="divresults">
+<table border="0" width="100%">
+<tr>
+	<td width="10px"></td>
+	<td width="100px" class="tdcenter">
+		<div class="my_button"><a href="#" onclick="clearAll(); return false;" ><div>Сброс</div></a></div>
+	</td>
+	<td width="10px"></td>
+	<td class="tdcenter">
+		<p class="resulttext">Сумма: <span id="result" class="resulttextgreen"></span></p>
+	</td>
+	<td width="10px"></td>
+	<td width="100px" class="tdcenter">
+		<div class="my_button"><a href="#" onClick="javascript:Print(); return false;" ><div>Печать</div></a></div>
+	</td>
+	<td width="10px"></td>
+</tr>
+</table>	
+<!--	<div class="divcenter">
+		
+		<button class = "control_btn" onclick="recalc()">Посчитать</button>
+		<button class = "control_btn"  onclick="clearAll()">Сброс</button> 	
+        </div> -->
+</div>
+
+
+<div class="content">
+
+<form name="keypressform">
+<table border="0px">
+<tr>
+<td>
+<!------------------------------------------------------------------>
+<table border="0px">
+<tr>
+	<td width="50px"></td>
+	<td><img src="./img/rub/rub_mul_5000.jpg" height="70px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="mul_5000" maxlength="5" size="5" min="0" max="99999"  value="1" onkeypress="return isNumber(event,1)"/></td>
+	<td></td>
+</tr>
+<tr></tr>
+<tr>
+    <td width="50px"></td>
+	<td><img src="./img/rub/rub_mul_1000.jpg" height="70px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="mul_1000" maxlength="5" size="5" min="0" max="99999" value="" onkeypress="return isNumber(event,2)"/></td>
+	<td></td>
+</tr>
+<tr></tr>
+<tr>
+	<td width="50px"></td>
+	<td><img src="./img/rub/rub_mul_500.jpg" height="70px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="mul_500" maxlength="5" size="5" min="0" max="99999" value="" onkeypress="return isNumber(event,3)"/></td>
+	<td></td>
+</tr>
+<tr></tr>
+<tr>
+	<td width="50px"></td>
+	<td><img src="./img/rub/rub_mul_100.jpg" height="70px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="mul_100" maxlength="5" size="5" min="0" max="99999" value="" onkeypress="return isNumber(event, 4)"/></td>
+	<td></td>
+</tr>
+<tr></tr>
+<tr>
+	<td width="50px"></td>
+	<td><img src="./img/rub/rub_mul_50.jpg" height="70px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="mul_50" maxlength="5" size="5" min="0" max="99999" value="" onkeypress="return isNumber(event, 5)"/></td>
+	<td></td>
+</tr>
+<tr></tr>
+<tr>
+	<td width="50px"></td>
+	<td><img src="./img/rub/rub_mul_10.jpg" height="70px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="mul_10" maxlength="5" size="5" min="0" max="99999" value="" onkeypress="return isNumber(event, 6)"/></td>
+	<td></td>
+</tr>
+<tr></tr>
+</table>
+</td>
+<td width = "50px"></td>
+<td>
+<!------------------------------------------------------------------>
+<table border="0px">
+<tr>
+	<td width="50px"></td>
+	<td align="center"><img src="./img/rub/rub_mul_10a.jpg" height="55px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="mul_10" maxlength="5" size="5" min="0" max="99999" value="" onkeypress="return isNumber(event,7)"/></td>
+	<td></td>
+</tr>
+<tr></tr>
+<tr>
+	<td width="50px"></td>
+	<td align="center"><img src="./img/rub/rub_mul_5a.jpg" height="65px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="mul_5" maxlength="5" size="5" min="0" max="99999" value="" onkeypress="return isNumber(event,8)"/></td>
+	<td></td>
+</tr>
+<tr></tr>
+<tr>
+	<td width="50px"></td>
+	<td align="center"><img src="./img/rub/rub_mul_2.jpg" height="58px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="mul_2" maxlength="5" size="5" min="0" max="99999" value="" onkeypress="return isNumber(event,9)"/></td>
+	<td></td>
+</tr>
+<tr></tr>
+<tr>
+	<td width="50px"></td>
+	<td align="center"><img src="./img/rub/rub_mul_1.jpg" height="55px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="mul_1" maxlength="5" size="5" min="0" max="99999" value="" onkeypress="return isNumber(event,10)"/></td>
+	<td></td>
+</tr>
+<tr></tr>
+<tr>
+	<td width="50px"></td>
+	<td align="center"><img src="./img/rub/rub_div_50.jpg" height="40px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="div_50" maxlength="5" size="5" min="0" max="99999" value="" onkeypress="return isNumber(event,11)"/></td>
+	<td></td>
+</tr>
+<tr></tr>
+<tr>
+	<td width="50px"></td>
+	<td align="center"><img src="./img/rub/rub_div_10.jpg" height="40px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="div_10" maxlength="5" size="5" min="0" max="99999" value="" onkeypress="return isNumber(event,12)"/></td>
+	<td></td>
+</tr>
+<tr></tr>
+<tr>
+	<td width="50px"></td>
+	<td align="center"><img src="./img/rub/rub_div_5.jpg" height="40px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="div_5" maxlength="5" size="5" min="0" max="99999" value="" onkeypress="return isNumber(event,13)"/></td>
+	<td></td>
+</tr>
+<tr></tr>
+<tr>
+	<td width="50px"></td>
+	<td align="center"><img src="./img/rub/rub_div_1.jpg" height="40px"/></td>
+	<td width="50px"></td>
+	<td width="60px" class="tdcenter"><input type="number" name="myedit" id="div_1" maxlength="5" size="5" min="0" max="99999" value="" onkeypress="return isNumber(event)"/></td>
+	<td></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+
+</div>
+</form>
+
+<!--
+<div class="divcenter">
+    <div class="my_button"><a href="#" onclick="clearAll(); return false;" ><div>Сброс</div></a></div>
+</div>
+-->
+
+
+        
+<div class="divcenter">
+<script type="text/javascript" src="./share/share.js"></script>
+
+</div>
+<div class="vdelim"></div>
+
+<div class="divfooter">
+</div>
+
+</div>
+<script language="Javascript">
+
+function getType(editId) {
+	return editId.substring(0, 3).toUpperCase();
+}
+
+function getNominal(editId) {
+	return parseInt(editId.substring(4));
+}
+
+function clearAll() {
+	iterate(function(area) {
+			area.value = "";
+		});
+	recalc();
+}
+
+function recalc() {
+	var summ = 0.0;
+	iterate(function(area) {
+			var type = getType(area.id);
+			var nominal = getNominal(area.id);
+			var value = area.value.length > 0 ? parseInt(area.value) : 0;
+			
+			if (type == "MUL") {
+				summ += nominal * value;
+			} else if (type == "DIV") {
+				summ += value * nominal / 100;
+			}
+		}
+	);
+		
+	document.getElementById("result").innerHTML = "";
+	if (! isNaN(summ)) {
+		document.getElementById("result").innerHTML = SummToString(summ);
+	}
+}
+
+function SummToString(summ) {
+	var i = Math.floor(summ * 100 + 0.001);
+	var d = i % 100;
+	var r = (i - d) / 100;
+	
+	var frac = "";
+	if (d == 0) {frac = "00"} 
+	else if (d < 10) {frac = "0" + d}
+	else frac = "" + d;
+
+	return r + " руб." + (d > 0 ? " " + frac + " коп." : "");
+}
+
+function subscribe() {
+	iterate(function(area) {
+		area.addEventListener("input", function(e) {recalc();}, false);
+	});
+}
+
+function iterate(f) {
+	var x = document.getElementsByName("myedit");
+	for (i = 0; i < x.length; ++i) {
+		if (x[i].type == "number" || x[i].type == "text") {
+			f(x[i]);
+		}
+	}
+}
+
+function GetPrintLink() {
+	var encode = function(s) {return encodeURIComponent(s);}
+	
+	var url = "./print.html?curency_mul=" + encode("руб.") + "&currency_div=" + encode("коп.") + "&divider=100";
+	iterate(function(area) {
+			var value = area.value.length > 0 ? parseInt(area.value) : 0;
+			if (value > 0) {
+				url += "&" + area.id + "=" + value;
+			}
+		}
+	);
+	
+	return url;
+}
+
+function OpenInNewTab(url) {
+  var win = window.open(url, '_blank');
+  win.focus();
+}
+
+
+function Print() {
+	OpenInNewTab(GetPrintLink());
+}
+
+var curf = window.onload;
+window.onload = function(){
+	subscribe(); 
+	recalc();
+    if (curf!= null) curf();
+}
+
+</script>
+
+
+</BODY>
+</HTML>
